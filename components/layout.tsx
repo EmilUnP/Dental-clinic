@@ -13,6 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from './ui/sidebar';
+import { Button } from './ui/button';
 import {
   Home,
   Users,
@@ -22,24 +23,26 @@ import {
   Briefcase
 } from "lucide-react";
 
-type Page = 'dashboard' | 'patients' | 'appointments' | 'services' | 'doctors';
+type Page = 'dashboard' | 'patients' | 'appointments' | 'services' | 'doctors' | 'workspace';
 
 const navigation = [
-  { name: 'Dashboard', page: 'dashboard' as Page, icon: Home },
-  { name: 'Patients', page: 'patients' as Page, icon: Users },
-  { name: 'Doctors', page: 'doctors' as Page, icon: UserCheck },
-  { name: 'Appointments', page: 'appointments' as Page, icon: Calendar },
-  { name: 'Services', page: 'services' as Page, icon: Settings },
-  { name: 'Doctor Workspace', page: 'doctors' as Page, icon: Briefcase },
+  { name: 'Dashboard', page: 'dashboard', icon: Home },
+  { name: 'Patients', page: 'patients', icon: Users },
+  { name: 'Doctors', page: 'doctors', icon: UserCheck },
+  { name: 'Appointments', page: 'appointments', icon: Calendar },
+  { name: 'Services', page: 'services', icon: Settings },
+  { name: 'Doctor Workspace', page: 'workspace', icon: Briefcase },
 ];
 
 interface LayoutProps {
   children: React.ReactNode;
-  currentPage: Page;
-  onPageChange: (page: Page) => void;
+  currentPage: string;
+  onPageChange: (page: string) => void;
+  onLogout?: () => void;
+  user?: { name: string; email: string };
 }
 
-export default function Layout({ children, currentPage, onPageChange }: LayoutProps) {
+export default function Layout({ children, currentPage, onPageChange, onLogout, user }: LayoutProps) {
 
   return (
     <SidebarProvider>
@@ -67,7 +70,10 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                       <SidebarMenuItem key={item.name}>
                         <SidebarMenuButton 
                           isActive={isActive}
-                          onClick={() => onPageChange(item.page)}
+                          onClick={() => {
+                            console.log('Sidebar clicked:', item.page);
+                            onPageChange(item.page);
+                          }}
                           className="w-full"
                         >
                           <item.icon className="h-4 w-4" />
@@ -94,8 +100,13 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
               <SidebarTrigger />
               <div className="flex items-center gap-4">
                 <div className="text-sm text-gray-600">
-                  Welcome back, Dr. Smith
+                  Welcome back, {user?.name || 'Dr. Smith'}
                 </div>
+                {onLogout && (
+                  <Button variant="outline" size="sm" onClick={onLogout}>
+                    Logout
+                  </Button>
+                )}
               </div>
             </div>
           </header>
